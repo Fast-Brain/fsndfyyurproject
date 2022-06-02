@@ -12,6 +12,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from models import Venue, Show, Artist, app, db
+import sys
 '''
   FIXED: AttributeError: module 'collections' has no attribute 'Callable'
   Collections.Callable and Python 3.10
@@ -190,15 +191,45 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  # TODO DONE: insert form data as a new Venue record in the db, instead
+  # TODO DONE: modify data to be the data object returned from db insertion
 
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
+  # flash('Venue ' + request.form['name'] + ' was successfully listed!')
+  # TODO DONE: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+
+  form = VenueForm(request.form)
+
+  venue = Venue(
+    name = form.name.data,
+    genres = form.genres.data,
+    address = form.address.data,
+    city = form.city.data,
+    state = form.state.data,
+    phone = form.phone.data,
+    website = form.website_link.data,
+    seeking_talent = form.seeking_talent.data,
+    seeking_description = form.seeking_description.data,
+    facebook_link = form.facebook_link.data,
+    image_link = form.image_link.data
+  )
+
+  try:
+    db.session.add(venue)
+    db.session.commit()
+    flash('Venue '+ request.form['name'] +' was successfully listed!')
+
+  except:
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    print(sys.exc_info())
+    db.session.rollback()
+
+  finally:
+    db.session.close()
   return render_template('pages/home.html')
+
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
