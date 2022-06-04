@@ -1,8 +1,7 @@
 from datetime import datetime #Import datetime to use datatime.utcnow()
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from sqlalchemy import false #Import flask migrate to use migration
+from flask_migrate import Migrate #Import flask migrate to use migration
 
 
 app = Flask(__name__)
@@ -13,6 +12,12 @@ app.config.from_object('config')
 # Initiate instance of database
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+#----------------------------------------------------------------------------#
+# Default Values.
+#----------------------------------------------------------------------------#
+def default_image():
+  weblink = 'https://via.placeholder.com/300'
+  return weblink
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
@@ -29,19 +34,13 @@ class Venue(db.Model):
     website = db.Column(db.String(120), nullable=False)
     facebook_link = db.Column(db.String(120), nullable=False)
     seeking_talent = db.Column(
-      db.Boolean(120), 
-      nullable=True, 
+      db.Boolean, 
       default=False
       )
-    seeking_description = db.Column(
-      db.String(250), 
-      nullable=True,
-      default=''
-      )
+    seeking_description = db.Column(db.String(250))
     image_link = db.Column(
       db.String(500), 
-      nullable=True, 
-      default='https://via.placeholder.com/300'
+      default= default_image
       )
     shows = db.relationship('Show', backref='venue', lazy=True)
 
@@ -62,17 +61,13 @@ class Artist(db.Model):
     website = db.Column(db.String(120), nullable=False)
     facebook_link = db.Column(db.String(120), nullable=False)
     seeking_venue = db.Column(
-      db.Boolean(120), 
-      nullable=True, 
+      db.Boolean, 
       default=False)
-    seeking_description = db.Column(
-      db.String(250), 
-      nullable=True, 
-      default='')
+    seeking_description = db.Column(db.String(250))
     image_link = db.Column(
       db.String(500), 
-      nullable=True, 
-      default='https://via.placeholder.com/300')
+      default=default_image
+      )
     shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
