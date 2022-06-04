@@ -278,21 +278,41 @@ def show_artist(artist_id):
   # TODO DONE: replace with real artist data from the artist table, using artist_id
   artist = Artist.query.get(artist_id)
 
-  past_shows = list()
-  upcoming_shows = list()
-
-  for show in artist.shows:
+  past_shows = []
+  upcoming_shows = []
+  past_shows_in_database = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>now).all()
+  for show in past_shows_in_database:
     artist_show = {
       "venue_id": show.venue.id,
       "venue_name": show.venue.name,
       "venue_image_link": show.venue.image_link,
       "start_time": format_datetime(str(show.start_time))
     }
+    past_shows.append(artist_show)
 
-    if show.start_time < now:
-      past_shows.append(artist_show)
-    else:
-      upcoming_shows.append(artist_show)
+  upcoming_shows_in_database = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>now).all()
+
+  for show in upcoming_shows_in_database:
+    artist_show = {
+      "venue_id": show.venue.id,
+      "venue_name": show.venue.name,
+      "venue_image_link": show.venue.image_link,
+      "start_time": format_datetime(str(show.start_time))
+    }
+    upcoming_shows.append(artist_show)
+
+  # for show in artist.shows:
+  #   artist_show = {
+  #     "venue_id": show.venue.id,
+  #     "venue_name": show.venue.name,
+  #     "venue_image_link": show.venue.image_link,
+  #     "start_time": format_datetime(str(show.start_time))
+  #   }
+
+  #   if show.start_time < now:
+  #     past_shows.append(artist_show)
+  #   else:
+  #     upcoming_shows.append(artist_show)
 
   data = {
     "id": artist.id,
